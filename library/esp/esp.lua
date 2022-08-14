@@ -193,9 +193,9 @@ end
 function espLibrary.getCharacter(player)
     if phantomforces then
 		local char = phantomforces.characters[player]
-		if char and typeof(rawget(char, "head")) == "Instance" then
-			character = char.head.Parent
-            return character, character and findFirstChild(character, "HumanoidRootPart");  
+		if char and typeof(rawget(char, "torso")) == "Instance" then
+			character = char.torso.Parent
+            return character, character and findFirstChild(character, "Torso");  
 		end
     else
         local character = player.Character;
