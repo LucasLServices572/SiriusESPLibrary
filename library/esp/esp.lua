@@ -106,6 +106,47 @@ local players = getService(game, "Players");
 local coreGui = getService(game, "CoreGui");
 local userInputService = getService(game, "UserInputService");
 
+local getregistry = getreg or debug.registry
+local getupvalues = getupvalues or debug.getupvalues
+local islocalclosure = isourclosure or isexecutorclosure or is_synapse_function
+
+-- game support
+
+local function getvariablefromregistry(parameters)
+	local variable
+	for _, f in pairs(getregistry()) do
+		if typeof(f) == "function" and not islocalclosure(f) then
+			for _, t in pairs(getupvalues(f)) do
+				if type(t) == "table" then
+					local c = 0
+					for _, v in pairs(parameters) do
+						if rawget(t, v) then
+							c += 1
+						end
+					end
+					if c == #parameters then
+						variable = t
+					end
+				end
+			end
+		end
+	end
+	return variable
+end
+
+local placeid = game["PlaceId"]
+local phantomforces
+if table.find({299659045, 292439477, 3568020459}, placeid) then
+	phantomforces = {
+		network = getvariablefromregistry({"add", "send", "fetch"}),
+		camera = getvariablefromregistry({"currentcamera", "setfirstpersoncam", "setspectate"}),
+		replication = getvariablefromregistry({"getbodyparts"}),
+		hud = getvariablefromregistry({"getplayerpos", "isplayeralive"}),
+		characters = {},
+	}
+	phantomforces.characters = debug.getupvalue(phantomforces.replication.getbodyparts, 1)
+end
+
 -- cache
 local currentCamera = workspace.CurrentCamera;
 local localPlayer = players.LocalPlayer;
@@ -150,8 +191,16 @@ function espLibrary.getTeam(player)
 end
 
 function espLibrary.getCharacter(player)
-    local character = player.Character;
-    return character, character and findFirstChild(character, "HumanoidRootPart");
+    if phantomforces then
+		local char = phantomforces.characters[player]
+		if char and typeof(rawget(char, "head")) == "Instance" then
+			character = char.head.Parent
+            return character, character and findFirstChild(character, "HumanoidRootPart");  
+		end
+    else
+        local character = player.Character;
+        return character, character and findFirstChild(character, "HumanoidRootPart");  
+	end
 end
 
 function espLibrary.getBoundingBox(character)
@@ -205,10 +254,12 @@ end
 
 function espLibrary.getHealth(player, character)
     local humanoid = findFirstChild(character, "Humanoid");
-
-    if (humanoid) then
+    
+    if not phantomforces and humanoid and humanoid.Health > 0 then
         return humanoid.Health, humanoid.MaxHealth;
-    end
+	elseif phantomforces and phantomforces.hud:getplayerhealth(player) > 0 then
+		return humanoid.Health, humanoid.MaxHealth;
+	end
 
     return 100, 100;
 end
