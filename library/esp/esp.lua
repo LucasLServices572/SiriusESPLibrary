@@ -258,7 +258,7 @@ function espLibrary.getHealth(player, character)
     if not phantomforces and humanoid and humanoid.Health > 0 then
         return humanoid.Health, humanoid.MaxHealth;
 	elseif phantomforces and phantomforces.hud:getplayerhealth(player) > 0 then
-		return humanoid.Health, humanoid.MaxHealth;
+		return phantomforces.hud:getplayerhealth(player), 100;
 	end
 
     return 100, 100;
