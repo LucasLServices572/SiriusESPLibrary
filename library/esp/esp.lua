@@ -623,7 +623,7 @@ function espLibrary:Load(renderValue)
                 end
 
                 highlight.Enabled = canShow;
-                highlight.DepthMode = self.options.visibleOnly and Enum.HighlightDepthMode.Occluded or Enum.HighlightDepthMode.AlwaysOnTop;
+                highlight.DepthMode = Enum.HighlightDepthMode.Occluded; -- self.options.visibleOnly and Enum.HighlightDepthMode.Occluded or Enum.HighlightDepthMode.AlwaysOnTop;
                 highlight.Adornee = character;
                 highlight.FillColor = color or self.options.chamsFillColor;
                 highlight.FillTransparency = self.options.chamsFillTransparency;
