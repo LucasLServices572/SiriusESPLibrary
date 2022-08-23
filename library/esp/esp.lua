@@ -539,7 +539,7 @@ function espLibrary:Load(renderValue)
                 objects.side.Size = self.options.fontSize;
                 objects.side.Transparency = self.options.healthTextTransparency;
                 objects.side.Color = color or self.options.healthTextColor;
-                objects.side.Text = health .. self.options.healthTextSuffix;
+                objects.side.Text = math.floor(health) .. self.options.healthTextSuffix;
                 objects.side.Position = round(position + vector2New(size.X + 3, -3));
 
                 objects.bottom.Visible = show and self.options.distance;
